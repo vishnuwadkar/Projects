@@ -1,3 +1,3 @@
-# Projects-2
+# Projects
 <br>
-This repo consists all my projects
+This repository consists all my projects!
