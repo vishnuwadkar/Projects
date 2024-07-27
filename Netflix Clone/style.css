@@ -37,6 +37,14 @@ nav {
     justify-content: space-between;
     height: 65px;
 }
+@media screen and (max-width: 500px){
+    nav{
+        max-width: 90vw;
+    }
+    .btns{
+        flex-direction: column;
+    }
+}
 
 
 nav .head {
