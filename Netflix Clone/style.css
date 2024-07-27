@@ -1,0 +1,384 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel+Sans:wght@200;300;400;600;700;800;900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: black;
+}
+
+.main {
+    height: 80vh;
+    background-image: url(https://assets.nflxext.com/ffe/siteui/vlv3/8728e059-7686-4d2d-a67a-84872bd71025/e90516bd-6925-4341-a6cf-0b9f3d0c140a/IN-en-20240708-POP_SIGNUP_TWO_WEEKS-perspective_WEB_34324b52-d094-482b-8c2a-708dc64c9065_small.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: max(1200px, 100vw);
+    position: relative;
+    height: 100vh;
+}
+
+.main .box {
+    width: 100%;
+    gap: 13px;
+    height: 100%;
+    opacity: 0.69;
+    background-color: black;
+    position: absolute;
+    top: 0;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    max-width: 75vw;
+    margin: auto;
+    justify-content: space-between;
+    height: 65px;
+}
+
+
+nav .head {
+    color: red;
+    width: 130px;
+    position: relative;
+    z-index: 10;
+    margin: 20px;
+}
+
+nav button {
+    margin: 15px;
+    position: relative;
+    z-index: 10;
+}
+
+.cont {
+    height: calc(100% - 65px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    font-weight: 900;
+    position: relative;
+    padding: 0 30px;
+    font-family: "Martel Sans", sans-serif;
+    /* margin-top: 150px; */
+}
+
+.cont> :first-child {
+    z-index: 10;
+    font-size: 40px;
+}
+
+.cont> :nth-child(2) {
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.cont> :nth-child(3) {
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.sep {
+    height: 7px;
+    background-color: rgb(67, 67, 67);
+}
+
+.btn {
+    padding: 4px;
+    cursor: pointer;
+    background-color: rgba(230, 227, 227, 0.058);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.535);
+    border-radius: 2px;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+}
+
+.btn-red {
+    background-color: red;
+    color: white;
+    padding: 3px 24px;
+    font-size: 20px;
+    border-radius: 4px;
+    font-weight: 400;
+}
+
+
+
+.btn-red-sm {
+    width: 90px;
+    height: 35px;
+    background-color: rgb(238, 0, 0);
+    border-radius: 4px;
+    color: white;
+    font-size: 18px;
+    border: 1px solid rgb(238, 0, 0);
+    padding: 4px;
+    font-weight: 200;
+}
+
+nav .inp {
+    font-weight: 200;
+    width: 130px;
+    padding: 4px;
+    height: 33px;
+    font-size: 18px;
+}
+
+nav select {
+    position: relative;
+    z-index: 10;
+}
+
+.btns {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.first {
+    max-width: 70vw;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    color: white;
+    margin: auto;
+    align-items: center;
+}
+
+.secimg {
+    position: relative;
+}
+
+.secimg img {
+    position: relative;
+    width: 30vw;
+    z-index: 10;
+}
+
+.secimg video {
+    position: absolute;
+    top: 62px;
+    left: 52px;
+    width: 22vw;
+
+}
+
+.imgtext {
+    font-family: "Martel Sans", sans-serif;
+    font-weight: 700;
+}
+
+.imgtext :first-child {
+    font-size: 48px;
+}
+
+.imgtext :second-child {
+    font-size: 28px;
+}
+
+.second {
+    max-width: 80vw;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    color: white;
+    margin: auto;
+    align-items: center;
+}
+
+.secimg2 img {
+    position: relative;
+    height: 100%;
+    width: 90%;
+}
+
+.secimg2 .stdown {
+    position: relative;
+    width: 280px;
+    height: 100px;
+    bottom: 130px;
+    background-color: black;
+    border: 2px solid rgb(115, 115, 115);
+    border-radius: 20px;
+    z-index: 10;
+    left: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 100;
+    gap: 8px;
+}
+
+#st {
+    width: 24%;
+    height: 80%;
+    margin: auto;
+}
+
+.secimg2 span :nth-child(2) {
+    color: blue;
+}
+
+.ani {
+    background-image: url(https://assets.nflxext.com/ffe/siteui/acquisition/ourStory/fuji/desktop/download-icon.gif);
+    background-size: cover;
+    height: 68%;
+    width: 25%;
+    position: relative;
+    right: 7px;
+}
+
+.imgtext2 div {
+    max-width: 40vw;
+    gap: 0;
+    font-stretch: condensed;
+}
+
+.imgtext3 {
+    margin-top: 10px;
+}
+
+.third {
+    margin-top: 10px;
+
+}
+
+.secimg3 {
+    margin-top: 10px;
+    max-width: 50vw
+}
+
+.secimg3 img {
+    width: 40vw;
+}
+
+.secimg3 video {
+    position: absolute;
+    top: 21px;
+    left: 94px;
+    width: 25vw;
+}
+
+.faq {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 35px;
+    font-family: "Martel Sans", sans-serif;
+    font-stretch: condensed;
+    font-weight: 800;
+}
+
+#faqtit {
+    font-size: 35px;
+}
+
+.faqbox {
+    transition: all 0.5s ease-out;
+    display: flex;
+    background-color: rgb(49, 49, 49);
+    font-size: 25px;
+    width: 80vw;
+    font-weight: 600;
+    margin: auto;
+    justify-content: space-between;
+    height: 90px;
+    align-items: center;
+}
+
+.faqbox:hover {
+    background-color: rgb(123, 123, 123);
+}
+
+.faqbox svg,
+.faqbox span {
+    text-align: center;
+    padding: 10px 26px;
+    height: fit-content;
+    cursor: pointer;
+}
+
+.faqtext {
+    height: 25vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    gap: 20px;
+    font-size: 25px;
+    font-weight: 300;
+}
+
+.inp {
+    width: 292px;
+    height: 40px;
+    background-color: rgba(34, 34, 34, 0.583);
+    border-radius: 4px;
+    color: white;
+    padding: 6px 40px;
+    border: 1px solid white;
+    margin: 20px;
+}
+
+.butt {
+    margin: 20px;
+    width: 198px;
+    height: 55px;
+    background-color: rgb(255, 0, 0);
+    border-radius: 4px;
+    color: white;
+    font-size: 28px;
+    border: 1px solid red;
+    padding: 0px;
+}
+
+footer {
+    height: 60vh;
+    max-width: 60vw;
+    margin: auto;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    font-family: "Martel Sans", sans-serif;
+    font-size: 16px;
+    font-stretch: extra-condensed;
+}
+
+.table {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.table div {
+    display: flex;
+    flex-direction: column;
+}
+
+.table a {
+    color: rgb(205, 204, 204);
+    font-weight: 150;
+    font-size: medium;
+}
+
+.fbut {
+    width: fit-content;
+    font-size: 20px;
+    padding: 5px 30px;
+    margin: 20px 0px;
+    height: 35px;
+}
