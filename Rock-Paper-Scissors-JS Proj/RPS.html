@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="x-icon" href="https://cdn-icons-png.flaticon.com/512/6727/6727583.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" href="RPS.css">
+</head>
+
+<body>
+    <main>
+        <h1>Rock-Paper-Scissors</h1>
+        <section class="game">
+            <button class="choices" id="rock">
+                <img class="btn" src="https://cdn-icons-png.freepik.com/256/10921/10921374.png?semt=ais_hybrid" alt="">
+            </button>
+            <button class="choices" id="paper">
+                <img class="btn" src="https://cdn-icons-png.freepik.com/256/13319/13319345.png?semt=ais_hybrid" alt="">
+            </button>
+            <button class="choices" id="scissors">
+                <img  class="btn" src="https://cdn-icons-png.freepik.com/256/8357/8357421.png?semt=ais_hybrid" alt="">
+            </button>
+        </section>
+        <section class="scr">
+            <div class="score userbox">
+                <h3>Your Score</h3>
+                <h3 id="man" class="fig">0</h3>
+            </div>
+            <div class="result">Choose your move</div>
+            <div class="score compbox">
+                <h3>Computer</h3>
+                <h3 id="comp" class="fig">0</h3>
+            </div>
+        </section>
+        <button id="reset">reset</button>
+    </main>
+    <script src="RPS.js"></script>
+</body>
+
+</html>
