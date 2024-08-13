@@ -1,1 +1,2 @@
-This is a simple cpp project which generates random but unique and strong passwords depending on required password size!
+This is a very simple cpp project which generates random but unique and strong passwords depending on required password size! 
+This project involves many basic yet crucial CPP concepts such as generating random numbers through functions, string operations, and many more!
