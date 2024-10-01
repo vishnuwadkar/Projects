@@ -1,0 +1,5 @@
+The "Gun, Water, Snake" game is a simple hand game, similar to Rock, Paper, Scissors. Players simultaneously form one of three possible shapes with their hands, and the outcome is determined based on the relationships between the shapes. Here’s how it typically works:
+
+Gun: Beats Snake (Gun "shoots" the Snake)
+Snake: Beats Water (Snake "drinks" or "poisons" the Water)
+Water: Beats Gun (Water "rusts" or "douses" the Gun)
