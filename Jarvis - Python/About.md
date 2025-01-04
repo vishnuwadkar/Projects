@@ -1,5 +1,5 @@
 <h1>Jarvis</h1>  
-Jarvis is a simple, yet efficient personal assistant built using Python and its basic modules. Designed with practicality in mind, Jarvis performs a variety of everyday tasks, including:<br>
+Jarvis is a simple, yet efficient and interactive personal voice assistant built using Python and its basic modules. Designed with practicality in mind, Jarvis performs a variety of everyday tasks, including:<br>
 
 Opening Websites and Applications: Quickly access your favorite websites or apps with ease.<br>
 Playing Music: Enjoy your favorite tunes with a simple command.<br>
