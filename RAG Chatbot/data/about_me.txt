@@ -1,0 +1,34 @@
+About Me — Vishnu Wadkar
+========================
+
+Hi, I'm Vishnu Wadkar, an aspiring AI/ML engineer with a strong foundation in
+computer science and a deep interest in building intelligent systems that solve
+real-world problems.
+
+I'm currently pursuing my studies in Artificial Intelligence and Machine Learning,
+where I've developed hands-on experience with deep learning, natural language
+processing, and data science. I enjoy turning complex problems into clean,
+modular solutions — and I believe the best way to learn is by building.
+
+My journey into AI started with a curiosity about how machines can understand
+language and make decisions. Since then, I've worked on projects ranging from
+chatbots and recommendation systems to computer vision applications. I'm
+particularly drawn to the intersection of NLP and practical applications —
+making AI accessible and useful for everyday tasks.
+
+Beyond technical skills, I value clear communication and collaboration. I
+believe that great engineering is not just about writing code — it's about
+understanding the problem, designing thoughtful solutions, and explaining
+your decisions clearly to others.
+
+When I'm not coding, you'll find me exploring new research papers, contributing
+to open-source projects, or experimenting with the latest AI tools and frameworks.
+
+Location: Pune, Maharashtra, India
+Email: vishnuwadkar@example.com
+LinkedIn: linkedin.com/in/vishnuwadkar
+GitHub: github.com/vishnuwadkar
+
+I'm actively looking for opportunities in AI/ML engineering, data science, and
+software development where I can contribute to meaningful projects and continue
+growing as an engineer.

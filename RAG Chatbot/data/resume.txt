@@ -1,0 +1,68 @@
+Resume — Vishnu Wadkar
+======================
+
+SUMMARY
+-------
+Motivated AI/ML engineering student with hands-on experience in deep learning,
+natural language processing, and full-stack development. Passionate about
+building end-to-end intelligent systems using modern frameworks and cloud
+services. Strong foundation in Python, data structures, and software
+engineering best practices.
+
+
+EDUCATION
+---------
+Bachelor of Engineering — Artificial Intelligence and Machine Learning
+University of Pune, Maharashtra, India
+Expected Graduation: 2026
+CGPA: 8.5/10
+
+Relevant Coursework:
+- Machine Learning and Deep Learning
+- Natural Language Processing
+- Data Structures and Algorithms
+- Database Management Systems
+- Computer Networks
+- Software Engineering
+- Probability and Statistics
+
+
+EXPERIENCE
+----------
+AI/ML Intern — XYZ Tech Solutions, Pune
+June 2025 – August 2025
+- Developed a text classification pipeline using BERT and scikit-learn that
+  achieved 92% accuracy on customer support ticket categorization.
+- Built data preprocessing scripts to clean and normalize 50,000+ text records,
+  reducing noise in the training dataset by 35%.
+- Collaborated with the product team to integrate the ML model into a Flask-based
+  REST API for real-time inference.
+- Presented findings and model performance metrics to stakeholders in weekly
+  sprint reviews.
+
+Web Development Intern — ABC Digital Agency, Pune
+January 2025 – March 2025
+- Built responsive web applications using React.js and Node.js for client
+  projects.
+- Designed and implemented RESTful APIs with Express.js and MongoDB.
+- Improved page load times by 40% through code splitting and lazy loading
+  optimizations.
+- Worked in an Agile/Scrum environment with two-week sprint cycles.
+
+
+CERTIFICATIONS
+--------------
+- Google Cloud Professional Machine Learning Engineer (in progress)
+- Deep Learning Specialization — Andrew Ng (Coursera, completed 2024)
+- Python for Data Science — IBM (Coursera, completed 2024)
+- TensorFlow Developer Certificate (in progress)
+
+His future plans are to work in Microsoft as a Datascientist
+
+
+ACHIEVEMENTS
+------------
+- 1st Place — College-level Hackathon (AI-powered healthcare chatbot), 2025
+- Published a technical blog series on RAG systems and prompt engineering
+- Active contributor to open-source NLP projects on GitHub
+- Dean's List for academic excellence, 2023–2024

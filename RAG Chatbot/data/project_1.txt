@@ -1,0 +1,79 @@
+Project 1 — RAG Chatbot Demo
+==============================
+
+PROJECT OVERVIEW
+----------------
+A portfolio-ready Retrieval-Augmented Generation (RAG) chatbot that answers
+questions grounded exclusively in uploaded documents. The chatbot cites its
+source documents, shows the retrieved chunks for transparency, and explicitly
+refuses to answer when the context doesn't support it — minimizing hallucination.
+
+This project demonstrates end-to-end understanding of modern AI pipelines:
+document ingestion, text chunking, vector embeddings, semantic retrieval,
+prompt engineering, and a clean user interface — all built with free-tier
+tools and zero model training.
+
+
+TECH STACK
+----------
+- Language: Python 3.11
+- Embedding Model: Google Gemini text-embedding-004 (free API)
+- LLM: Google Gemini 2.5 Flash (free tier, 1500 requests/day)
+- Vector Database: ChromaDB (local, persistent, no server setup)
+- UI Framework: Streamlit (single-page chat interface)
+- Environment: python-dotenv for API key management
+
+
+HOW IT WORKS
+------------
+1. INGESTION (run once):
+   - Loads all .txt and .md files from a data directory.
+   - Splits each document into chunks of ~500 whitespace tokens with ~50 tokens
+     of overlap between consecutive chunks.
+   - Embeds each chunk using the Gemini Embedding API (text-embedding-004) with
+     the RETRIEVAL_DOCUMENT task type.
+   - Stores chunks, embeddings, and metadata (source filename, chunk index)
+     in a local ChromaDB collection using cosine similarity.
+
+2. RETRIEVAL (on each question):
+   - Embeds the user's question using the same model with RETRIEVAL_QUERY
+     task type.
+   - Queries ChromaDB for the top-4 most similar chunks via cosine similarity.
+
+3. GENERATION:
+   - Constructs a prompt with the retrieved chunks as context and the user's
+     question.
+   - Sends the prompt to Gemini 2.5 Flash with a strict system prompt that
+     enforces grounded answering and source citation.
+   - If the answer isn't in the context, the model says "I don't have enough
+     information in the provided documents."
+
+4. DISPLAY:
+   - Shows the generated answer in a chat-style interface.
+   - Displays the retrieved source chunks in an expandable section with
+     similarity scores and source file names.
+
+
+KEY DESIGN DECISIONS
+--------------------
+- Fixed-size chunking with overlap was chosen for simplicity and predictability.
+  Overlap ensures sentences at chunk boundaries aren't lost.
+- Cosine similarity is the standard for dense retrieval with normalized
+  embeddings.
+- Top-K=4 provides enough context without overwhelming the LLM prompt.
+- Low temperature (0.2) encourages factual, grounded responses.
+- Rate-limit retry logic handles Gemini free-tier 429 errors gracefully.
+
+
+MY ROLE
+-------
+I designed and built the entire project end-to-end: architecture, ingestion
+pipeline, retrieval logic, prompt engineering, Streamlit UI, and documentation.
+
+
+OUTCOME
+-------
+A fully functional, demo-ready RAG chatbot that runs locally with zero cost,
+showcasing practical understanding of modern AI/NLP techniques.
+
+GitHub: github.com/vishnuwadkar/rag-chatbot-demo

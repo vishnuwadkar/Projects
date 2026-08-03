@@ -1,0 +1,95 @@
+Project 2 — AI-Powered Healthcare Chatbot
+===========================================
+
+PROJECT OVERVIEW
+----------------
+An AI-powered chatbot designed to help users understand common health symptoms,
+find relevant medical information, and get guidance on when to seek professional
+medical advice. Built as a hackathon project that won 1st place at the
+college-level AI hackathon in 2025.
+
+This project addresses the problem of medical misinformation by providing
+verified, source-backed health information instead of unverified internet
+search results. The chatbot is NOT a diagnostic tool — it always recommends
+consulting a healthcare professional for actual medical decisions.
+
+
+TECH STACK
+----------
+- Language: Python 3.11
+- Backend: FastAPI for the REST API
+- NLP Model: Fine-tuned DistilBERT for symptom classification
+- Knowledge Base: Curated medical FAQ dataset (500+ Q&A pairs)
+- Database: PostgreSQL for user session tracking
+- Frontend: React.js with Tailwind CSS
+- Deployment: Docker containers on Google Cloud Run (free tier)
+
+
+HOW IT WORKS
+------------
+1. USER INPUT:
+   - Users describe their symptoms in natural language through a chat interface.
+
+2. SYMPTOM CLASSIFICATION:
+   - A fine-tuned DistilBERT model classifies the input into one of 25 common
+     symptom categories (e.g., headache, fever, fatigue, chest pain).
+   - The model achieves 89% accuracy on the test set.
+
+3. INFORMATION RETRIEVAL:
+   - Based on the classified symptom category, the system retrieves relevant
+     medical FAQ entries from the curated knowledge base.
+   - Responses include: common causes, home remedies, and red-flag symptoms
+     that require immediate medical attention.
+
+4. RESPONSE GENERATION:
+   - The chatbot generates a structured response with:
+     a) Acknowledgment of the user's symptoms
+     b) Possible common causes (from the knowledge base)
+     c) General self-care suggestions
+     d) Clear guidance on when to see a doctor
+   - Every response ends with a disclaimer: "This is not medical advice.
+     Please consult a healthcare professional."
+
+5. SESSION TRACKING:
+   - User conversations are tracked (anonymously) to maintain context within
+     a session.
+   - No personal health data is stored permanently.
+
+
+KEY DESIGN DECISIONS
+--------------------
+- DistilBERT was chosen over larger models for fast inference and low compute
+  requirements — critical for a free-tier deployment.
+- The curated FAQ approach was preferred over open-ended generation to
+  minimize the risk of generating harmful medical misinformation.
+- The system deliberately avoids diagnosis — it classifies symptoms into
+  categories and retrieves pre-verified information, rather than generating
+  medical opinions.
+- Docker + Cloud Run allows automatic scaling to zero (no cost when idle).
+
+
+MY ROLE
+-------
+I was the ML lead on a team of 4. My responsibilities included:
+- Designing the NLP pipeline (tokenization, classification, response retrieval)
+- Fine-tuning the DistilBERT model on the symptom classification dataset
+- Building the FastAPI backend and integrating with the React frontend
+- Writing the project documentation and presenting at the hackathon
+
+TEAM MEMBERS
+------------
+- Vishnu Wadkar — ML Lead (NLP pipeline, model training, backend)
+- Teammate 2 — Frontend Developer (React UI, user experience)
+- Teammate 3 — Data Engineer (dataset curation, database setup)
+- Teammate 4 — DevOps (Docker, Cloud Run deployment, CI/CD)
+
+
+OUTCOME
+-------
+- Won 1st place at the college-level AI hackathon (2025)
+- Successfully handled 200+ demo queries during the hackathon presentation
+  with <2 second response times
+- Received positive feedback from judges for the emphasis on safety
+  (disclaimers, no diagnosis, source-backed responses)
+
+GitHub: github.com/vishnuwadkar/healthcare-chatbot

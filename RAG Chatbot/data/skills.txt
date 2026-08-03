@@ -1,0 +1,59 @@
+Technical Skills — Vishnu Wadkar
+=================================
+
+PROGRAMMING LANGUAGES
+---------------------
+- Python: Advanced — primary language for all ML/AI work, scripting, and
+  backend development. Comfortable with type hints, virtual environments,
+  and packaging.
+- JavaScript/TypeScript: Intermediate — used for full-stack web development
+  with React and Node.js.
+- SQL: Intermediate — writing complex queries, joins, and aggregations for
+  data analysis and backend applications.
+- Java: Basic — used in academic coursework for data structures and algorithms.
+- C++: Basic — used for competitive programming and systems-level understanding.
+
+
+MACHINE LEARNING & AI
+---------------------
+- Deep Learning Frameworks: PyTorch (primary), TensorFlow, Keras
+- NLP: Hugging Face Transformers, spaCy, NLTK, text embeddings, RAG pipelines
+- Computer Vision: OpenCV, image classification, object detection basics
+- Classical ML: scikit-learn (classification, regression, clustering, pipelines)
+- Experiment Tracking: Weights & Biases, MLflow
+- Data Processing: Pandas, NumPy, Matplotlib, Seaborn
+
+
+GENERATIVE AI & LLMs
+---------------------
+- LLM APIs: Google Gemini API, OpenAI API
+- RAG (Retrieval-Augmented Generation): ChromaDB, FAISS, LangChain
+- Prompt Engineering: system prompts, few-shot prompting, chain-of-thought
+- Embeddings: text-embedding-004, sentence-transformers
+- Vector Databases: ChromaDB, FAISS, Pinecone (basic)
+
+
+WEB DEVELOPMENT
+---------------
+- Frontend: React.js, HTML5, CSS3, Streamlit
+- Backend: Flask, FastAPI, Express.js, Node.js
+- Databases: MongoDB, PostgreSQL, MySQL, SQLite
+- APIs: RESTful API design, API integration, Postman
+
+
+DEVOPS & TOOLS
+--------------
+- Version Control: Git, GitHub (branching, PRs, CI workflows)
+- Containers: Docker (basic — building and running containers)
+- Cloud: Google Cloud Platform (basic), AWS (basic)
+- IDEs: VS Code, PyCharm, Jupyter Notebook
+- OS: Linux (Ubuntu), Windows
+
+
+SOFT SKILLS
+-----------
+- Clear technical communication and documentation
+- Problem decomposition and systematic debugging
+- Agile/Scrum collaboration
+- Technical presentation and demo skills
+- Self-directed learning and quick ramp-up on new technologies
