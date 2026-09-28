@@ -1,14 +1,14 @@
 """
-rag_pipeline.py  --  Retrieval-Augmented Generation Pipeline
-==========================================================
+rag_pipeline.py  --  Vedabase Spiritual RAG Pipeline
+=====================================================
 Core RAG logic: embed a user query, retrieve relevant chunks from ChromaDB,
-build a grounded prompt, and generate an answer using Gemini.
+build a grounded spiritual prompt, and generate an answer using Gemini.
 
 This module is imported by app.py (Streamlit UI). It can also be used
 standalone for testing:
 
     from rag_pipeline import query_rag
-    result = query_rag("What are Vishnu's skills?")
+    result = query_rag("What does Krishna say about the soul?")
     print(result["answer"])
 """
 
@@ -26,20 +26,38 @@ import chromadb
 # ---------------------------------------------------------------------------
 
 CHROMA_DIR = Path("./chroma_db")
-COLLECTION_NAME = "rag_documents"
+COLLECTION_NAME = "vedabase_docs"
 EMBEDDING_MODEL = "gemini-embedding-001"
-GENERATION_MODEL = "gemini-flash-latest"
-TOP_K = 4          # Number of chunks to retrieve
-RETRY_DELAY = 5    # Seconds to wait before retrying on rate limit
 
-# Strict system prompt to minimize hallucination
-SYSTEM_PROMPT = """You are a helpful assistant. Answer the user's question ONLY using the provided context below. Follow these rules strictly:
+GENERATION_MODELS = [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.5-flash",
+]
 
-1. Use ONLY the information in the CONTEXT to answer. Do NOT use any outside knowledge.
-2. If the answer is not contained in the context, respond with: "I don't have enough information in the provided documents to answer that question."
-3. At the end of your answer, always list which source file(s) you used in a "Sources:" section.
-4. Be concise and direct in your answers.
-5. If the context partially answers the question, answer what you can and note what information is missing."""
+TOP_K = 4  # Optimized for faster responses while retaining high precision
+RETRY_DELAY = 3  # Reduced retry delay
+
+
+# Strict spiritual grounding prompt
+SYSTEM_PROMPT = """You are a scholarly spiritual assistant grounded exclusively in the teachings of His Divine Grace A.C. Bhaktivedanta Swami Prabhupāda, as published on vedabase.io.
+
+You have access to the translations and purports of sacred Vedic texts including Bhagavad-gītā As It Is, Śrīmad-Bhāgavatam, Śrī Caitanya-caritāmṛta, and other books by Śrīla Prabhupāda.
+
+RULES — follow these strictly:
+
+1. Answer ONLY from the provided CONTEXT. Never use outside knowledge or your own training data.
+2. When quoting a verse translation, format it as a blockquote and cite the reference (e.g., BG 2.47).
+3. When explaining a concept, reference the purport and cite the source precisely.
+4. If the context does not contain the answer, respond with:
+   "I could not find a direct reference in the available scriptures for this question. You may want to search vedabase.io directly for more information."
+5. Always include a "📖 Sources" section at the end listing each scripture reference used, formatted as:
+   - **Reference** — Book Name (Chapter Title)
+6. Be respectful of the Vaiṣṇava tradition. Use proper diacritical marks for Sanskrit terms where possible.
+7. Do NOT speculate, interpret beyond what Śrīla Prabhupāda has written, or mix in teachings from other spiritual traditions.
+8. Be concise but thorough. If multiple verses are relevant, cite all of them.
+9. If the context only partially answers the question, answer what you can and note what additional information might be found.
+10. When asked about practices (chanting, meditation, devotion), ground your answer in the specific instructions from the purports."""
 
 
 # ---------------------------------------------------------------------------
@@ -71,20 +89,47 @@ def _get_genai_client() -> genai.Client:
 def get_chroma_collection():
     """
     Connect to the persisted ChromaDB collection.
-    Returns the collection object, or raises if ingestion hasn't run.
+    Returns the collection object, falling back to 'rag_documents' or creating 'vedabase_docs'
+    if ingestion hasn't been run yet.
     """
     global _chroma_collection
     if _chroma_collection is None:
-        if not CHROMA_DIR.exists():
-            raise FileNotFoundError(
-                f"ChromaDB directory '{CHROMA_DIR}' not found. "
-                "Run 'python ingest.py' first to ingest your documents."
-            )
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
         chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        _chroma_collection = chroma_client.get_collection(
-            name=COLLECTION_NAME,
-        )
+        
+        try:
+            _chroma_collection = chroma_client.get_collection(name=COLLECTION_NAME)
+        except Exception:
+            # Check if legacy collection exists
+            existing = [c.name for c in chroma_client.list_collections()]
+            if "rag_documents" in existing:
+                _chroma_collection = chroma_client.get_collection(name="rag_documents")
+            else:
+                _chroma_collection = chroma_client.get_or_create_collection(name=COLLECTION_NAME)
     return _chroma_collection
+
+
+
+def get_collection_stats() -> dict:
+    """Return stats about the ChromaDB collection for the UI."""
+    try:
+        collection = get_chroma_collection()
+        count = collection.count()
+
+        # Sample some metadata to get book list
+        sample = collection.peek(limit=100)
+        books = set()
+        for meta in sample.get("metadatas", []):
+            if meta and "book" in meta:
+                books.add(meta["book"])
+
+        return {
+            "total_chunks": count,
+            "books": sorted(books),
+            "collection_name": COLLECTION_NAME,
+        }
+    except Exception:
+        return {"total_chunks": 0, "books": [], "collection_name": COLLECTION_NAME}
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +143,7 @@ def retrieve_chunks(query: str, top_k: int = TOP_K) -> dict:
 
     Returns a dict with:
       - "documents": list of chunk texts
-      - "metadatas": list of metadata dicts (source, chunk_index)
+      - "metadatas": list of metadata dicts (book, chapter, verse, etc.)
       - "distances": list of cosine distances (lower = more similar)
     """
     client = _get_genai_client()
@@ -136,22 +181,27 @@ def build_prompt(query: str, retrieved: dict) -> str:
     """
     Assemble the user prompt with retrieved context chunks.
 
-    Each chunk is numbered and labeled with its source file so the LLM
+    Each chunk is labeled with its scripture reference so the LLM
     can cite specific sources in its answer.
     """
     context_parts = []
     for i, (doc, meta) in enumerate(
         zip(retrieved["documents"], retrieved["metadatas"]), start=1
     ):
-        source = meta["source"]
-        chunk_idx = meta["chunk_index"]
-        context_parts.append(
-            f"[Chunk {i}] (Source: {source}, Chunk #{chunk_idx})\n{doc}"
-        )
+        reference = meta.get("reference", "Unknown")
+        book = meta.get("book", "")
+        chapter_title = meta.get("chapter_title", "")
+        content_type = meta.get("content_type", "")
+
+        label = f"[Source {i}] {reference}"
+        if chapter_title:
+            label += f" — {chapter_title}"
+
+        context_parts.append(f"### {label}\n{doc}")
 
     context_block = "\n\n---\n\n".join(context_parts)
 
-    prompt = f"""CONTEXT:
+    prompt = f"""CONTEXT (from Vedabase scriptures):
 {context_block}
 
 USER QUESTION:
@@ -167,112 +217,79 @@ USER QUESTION:
 def generate_answer(query: str, retrieved: dict) -> str:
     """
     Send the retrieved context + user question to Gemini and return
-    the generated answer.
-
-    Rate-limit handling:
-      - On a 429 error, extract the retry delay from the API response
-        (or use exponential backoff) and retry up to 3 times.
-      - If all retries fail, return a friendly error message.
+    the generated answer, automatically falling back across model candidates.
     """
     client = _get_genai_client()
     prompt = build_prompt(query, retrieved)
-    max_retries = 3
-    base_delay = RETRY_DELAY  # 5 seconds
 
-    for attempt in range(max_retries):
-        try:
-            response = client.models.generate_content(
-                model=GENERATION_MODEL,
-                contents=prompt,
-                config={
-                    "system_instruction": SYSTEM_PROMPT,
-                    "temperature": 0.2,  # Low temp for factual grounding
-                },
-            )
-            return response.text
-
-        except genai_errors.ClientError as e:
-            error_str = str(e)
-            is_rate_limit = "429" in error_str or "RESOURCE_EXHAUSTED" in error_str
-
-            if is_rate_limit and attempt < max_retries - 1:
-                # Try to extract suggested retry delay from error message
-                import re
-                delay_match = re.search(r"retry in ([\d.]+)s", error_str)
-                if delay_match:
-                    wait_time = min(float(delay_match.group(1)) + 1, 60)
-                else:
-                    # Exponential backoff: 10s, 20s, 30s
-                    wait_time = base_delay * (attempt + 2)
-                time.sleep(wait_time)
-                continue
-            elif is_rate_limit:
-                # All retries exhausted -- give up gracefully
-                return (
-                    "The Gemini API is currently rate-limited. "
-                    "Please wait about 30 seconds and try again. "
-                    "(Free tier has per-minute quotas)"
+    last_exception = None
+    for model in GENERATION_MODELS:
+        for attempt in range(2):
+            try:
+                response = client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config={
+                        "system_instruction": SYSTEM_PROMPT,
+                        "temperature": 0.2,
+                    },
                 )
-            else:
-                # Non-rate-limit error -- re-raise
-                raise
+                return response.text
+            except genai_errors.ClientError as e:
+                error_str = str(e)
+                last_exception = e
+                if "404" in error_str or "NOT_FOUND" in error_str:
+                    # Model not available in this region/key tier -- try next candidate
+                    break
+                if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                    time.sleep(RETRY_DELAY * (attempt + 1))
+                    continue
+                break
+    
+    if last_exception:
+        raise last_exception
+    return "Unable to generate answer."
 
-
-# ---------------------------------------------------------------------------
-# Streaming Generation (for real-time UI feedback)
-# ---------------------------------------------------------------------------
 
 def generate_answer_stream(query: str, retrieved: dict):
     """
-    Stream the generated answer token-by-token for real-time UI display.
-
-    Yields text chunks as they arrive from Gemini, making the response
-    feel much faster even though total time is similar.
-
-    Falls back to non-streaming on rate-limit errors.
+    Stream the generated answer token-by-token for real-time UI display,
+    falling back to candidate models if a model is unavailable.
     """
     client = _get_genai_client()
     prompt = build_prompt(query, retrieved)
-    max_retries = 3
-    base_delay = RETRY_DELAY
 
-    for attempt in range(max_retries):
+    last_exception = None
+    for model in GENERATION_MODELS:
         try:
             response = client.models.generate_content_stream(
-                model=GENERATION_MODEL,
+                model=model,
                 contents=prompt,
                 config={
                     "system_instruction": SYSTEM_PROMPT,
                     "temperature": 0.2,
                 },
             )
+            has_yielded = False
             for chunk in response:
                 if chunk.text:
+                    has_yielded = True
                     yield chunk.text
-            return  # Done streaming
-
+            if has_yielded:
+                return
         except genai_errors.ClientError as e:
             error_str = str(e)
-            is_rate_limit = "429" in error_str or "RESOURCE_EXHAUSTED" in error_str
-
-            if is_rate_limit and attempt < max_retries - 1:
-                import re
-                delay_match = re.search(r"retry in ([\d.]+)s", error_str)
-                if delay_match:
-                    wait_time = min(float(delay_match.group(1)) + 1, 60)
-                else:
-                    wait_time = base_delay * (attempt + 2)
-                time.sleep(wait_time)
+            last_exception = e
+            if "404" in error_str or "NOT_FOUND" in error_str:
                 continue
-            elif is_rate_limit:
-                yield (
-                    "The Gemini API is currently rate-limited. "
-                    "Please wait about 30 seconds and try again. "
-                    "(Free tier has per-minute quotas)"
-                )
-                return
-            else:
-                raise
+            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                time.sleep(RETRY_DELAY)
+                continue
+            raise e
+
+    if last_exception:
+        yield f"🙏 Error accessing Gemini model: {last_exception}"
+
 
 
 # ---------------------------------------------------------------------------
@@ -326,16 +343,30 @@ def query_rag_stream(user_question: str) -> dict:
 def _package_sources(retrieved: dict) -> list[dict]:
     """Extract source metadata from retrieved chunks for the UI."""
     sources = []
+    seen_refs = set()
+
     for doc, meta, dist in zip(
         retrieved["documents"],
         retrieved["metadatas"],
         retrieved["distances"],
     ):
+        reference = meta.get("reference", "Unknown")
+
+        # Deduplicate by reference (same verse may appear in multiple chunks)
+        if reference in seen_refs:
+            continue
+        seen_refs.add(reference)
+
         sources.append({
             "text": doc,
-            "source": meta["source"],
-            "chunk_index": meta["chunk_index"],
-            "distance": round(dist, 4),
+            "reference": reference,
+            "book": meta.get("book", ""),
+            "book_code": meta.get("book_code", ""),
+            "chapter": meta.get("chapter", ""),
+            "chapter_title": meta.get("chapter_title", ""),
+            "verse": meta.get("verse", ""),
+            "content_type": meta.get("content_type", ""),
+            "url": meta.get("url", ""),
+            "similarity": round(1 - dist, 4),  # Convert distance to similarity
         })
     return sources
-

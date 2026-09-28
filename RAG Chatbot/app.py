@@ -1,9 +1,10 @@
 """
-app.py -- Premium RAG Chatbot UI
-=================================
-A polished, ChatGPT-tier chat interface for document-grounded QA.
-Features dual-theme, glassmorphism sidebar, streaming responses,
-animated citations, conversation history, and responsive design.
+app.py -- Vedabase Spiritual Chatbot UI
+========================================
+A premium, spiritually-themed chat interface for scripture-grounded Q&A.
+Features dual-theme (saffron dark/light), glassmorphism sidebar, streaming
+responses, animated scripture citations with Vedabase deep-links,
+conversation history, and responsive design.
 
 Run with:
     streamlit run app.py
@@ -15,8 +16,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 import streamlit as st
-from rag_pipeline import query_rag_stream, get_chroma_collection
-from ingest import ingest_single_document
+from rag_pipeline import query_rag_stream, get_chroma_collection, get_collection_stats
 
 
 # ---------------------------------------------------------------------------
@@ -24,8 +24,8 @@ from ingest import ingest_single_document
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="RAG Knowledge Assistant",
-    page_icon="R",
+    page_title="Vedabase Spiritual Assistant",
+    page_icon="🕉️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -52,7 +52,7 @@ if "total_sources" not in st.session_state:
 
 
 # ---------------------------------------------------------------------------
-# Theme CSS Variables
+# Theme CSS Variables — Spiritual Palette
 # ---------------------------------------------------------------------------
 
 def get_theme_css():
@@ -62,36 +62,37 @@ def get_theme_css():
     if is_dark:
         return """
         :root {
-            --bg-primary: #0B1120;
-            --bg-secondary: #111827;
-            --bg-tertiary: #1E293B;
-            --bg-surface: #0F172A;
-            --bg-hover: #1E293B;
-            --bg-input: #1E293B;
-            --bg-sidebar: rgba(15, 23, 42, 0.85);
-            --bg-card: rgba(30, 41, 59, 0.6);
-            --bg-user-msg: #1D4ED8;
-            --bg-ai-msg: rgba(30, 41, 59, 0.5);
-            --bg-code: #0D1117;
-            --border-primary: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(99, 102, 241, 0.4);
-            --border-focus: rgba(37, 99, 235, 0.5);
-            --text-primary: #F1F5F9;
-            --text-secondary: #94A3B8;
-            --text-tertiary: #64748B;
-            --text-muted: #475569;
+            --bg-primary: #0D0A1A;
+            --bg-secondary: #13102A;
+            --bg-tertiary: #1E1838;
+            --bg-surface: #110E24;
+            --bg-hover: #1E1838;
+            --bg-input: #1E1838;
+            --bg-sidebar: rgba(13, 10, 26, 0.9);
+            --bg-card: rgba(30, 24, 56, 0.6);
+            --bg-user-msg: #8B4513;
+            --bg-ai-msg: rgba(30, 24, 56, 0.5);
+            --bg-code: #0D0A1A;
+            --border-primary: rgba(255, 153, 51, 0.12);
+            --border-hover: rgba(255, 153, 51, 0.35);
+            --border-focus: rgba(255, 153, 51, 0.5);
+            --text-primary: #F5E6D3;
+            --text-secondary: #B8A594;
+            --text-tertiary: #7A6B5D;
+            --text-muted: #5A4D42;
             --text-user-msg: #FFFFFF;
             --text-on-primary: #FFFFFF;
-            --accent-primary: #2563EB;
-            --accent-secondary: #7C3AED;
-            --accent-gradient: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
-            --success: #10B981;
-            --warning: #F59E0B;
-            --error: #EF4444;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+            --accent-primary: #FF9933;
+            --accent-secondary: #CC6600;
+            --accent-gradient: linear-gradient(135deg, #FF9933 0%, #CC6600 50%, #993300 100%);
+            --accent-glow: rgba(255, 153, 51, 0.15);
+            --success: #8FBF6F;
+            --warning: #E6A834;
+            --error: #D45B5B;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 20px rgba(255, 153, 51, 0.12);
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
@@ -102,36 +103,37 @@ def get_theme_css():
     else:
         return """
         :root {
-            --bg-primary: #FFFFFF;
-            --bg-secondary: #F8FAFC;
-            --bg-tertiary: #F1F5F9;
-            --bg-surface: #FFFFFF;
-            --bg-hover: #F1F5F9;
-            --bg-input: #F8FAFC;
-            --bg-sidebar: rgba(248, 250, 252, 0.9);
-            --bg-card: rgba(241, 245, 249, 0.7);
-            --bg-user-msg: #2563EB;
-            --bg-ai-msg: #F8FAFC;
-            --bg-code: #F6F8FA;
-            --border-primary: rgba(0, 0, 0, 0.08);
-            --border-hover: rgba(37, 99, 235, 0.3);
-            --border-focus: rgba(37, 99, 235, 0.5);
-            --text-primary: #0F172A;
-            --text-secondary: #475569;
-            --text-tertiary: #94A3B8;
-            --text-muted: #CBD5E1;
+            --bg-primary: #FFF8F0;
+            --bg-secondary: #FFF3E6;
+            --bg-tertiary: #FFEBD6;
+            --bg-surface: #FFFAF5;
+            --bg-hover: #FFEBD6;
+            --bg-input: #FFF3E6;
+            --bg-sidebar: rgba(255, 248, 240, 0.92);
+            --bg-card: rgba(255, 235, 214, 0.6);
+            --bg-user-msg: #CC6600;
+            --bg-ai-msg: #FFF3E6;
+            --bg-code: #FFF8F0;
+            --border-primary: rgba(153, 102, 51, 0.15);
+            --border-hover: rgba(204, 102, 0, 0.35);
+            --border-focus: rgba(204, 102, 0, 0.5);
+            --text-primary: #2D1B0E;
+            --text-secondary: #5A3D28;
+            --text-tertiary: #8C6D52;
+            --text-muted: #C4A882;
             --text-user-msg: #FFFFFF;
             --text-on-primary: #FFFFFF;
-            --accent-primary: #2563EB;
-            --accent-secondary: #7C3AED;
-            --accent-gradient: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
-            --success: #059669;
-            --warning: #D97706;
-            --error: #DC2626;
+            --accent-primary: #CC6600;
+            --accent-secondary: #994D00;
+            --accent-gradient: linear-gradient(135deg, #FF9933 0%, #CC6600 50%, #993300 100%);
+            --accent-glow: rgba(204, 102, 0, 0.08);
+            --success: #5A8A3C;
+            --warning: #B8862D;
+            --error: #B84444;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.08);
+            --shadow-glow: 0 0 20px rgba(204, 102, 0, 0.06);
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
@@ -148,7 +150,7 @@ def get_theme_css():
 DESIGN_SYSTEM_CSS = f"""
 <style>
     /* ===== FONTS ===== */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
     /* ===== THEME VARIABLES ===== */
     {{theme_css}}
@@ -200,6 +202,11 @@ DESIGN_SYSTEM_CSS = f"""
         to {{ opacity: 1; transform: scale(1); }}
     }}
 
+    @keyframes gentleFloat {{
+        0%, 100% {{ transform: translateY(0px); }}
+        50% {{ transform: translateY(-4px); }}
+    }}
+
     /* ===== GLOBAL RESET ===== */
     html, body, [class*="css"] {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -244,11 +251,6 @@ DESIGN_SYSTEM_CSS = f"""
         color: var(--text-primary) !important;
     }}
 
-    /* File uploader text fix */
-    [data-testid="stFileUploadDropzone"] * {{
-        color: var(--text-primary) !important;
-    }}
-
     /* ===== SIDEBAR COMPONENTS ===== */
     .sidebar-brand {{
         display: flex;
@@ -261,14 +263,14 @@ DESIGN_SYSTEM_CSS = f"""
     }}
 
     .sidebar-brand-icon {{
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: var(--radius-md);
         background: var(--accent-gradient);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
+        font-size: 1.4rem;
         box-shadow: var(--shadow-md);
         flex-shrink: 0;
     }}
@@ -280,19 +282,19 @@ DESIGN_SYSTEM_CSS = f"""
     }}
 
     .sidebar-brand-name {{
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Playfair Display', serif;
         font-size: 1.1rem;
-        font-weight: 800;
+        font-weight: 700;
         color: var(--text-primary) !important;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
         line-height: 1.2;
     }}
 
     .sidebar-brand-tag {{
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         font-weight: 500;
         color: var(--text-tertiary) !important;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.04em;
     }}
 
     .sidebar-section {{
@@ -301,7 +303,7 @@ DESIGN_SYSTEM_CSS = f"""
     }}
 
     .sidebar-label {{
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Inter', sans-serif;
         font-size: 0.68rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -344,7 +346,7 @@ DESIGN_SYSTEM_CSS = f"""
 
     .status-offline .status-dot {{
         background: var(--error);
-        box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+        box-shadow: 0 0 6px rgba(212, 91, 91, 0.5);
     }}
 
     .status-text {{
@@ -384,6 +386,28 @@ DESIGN_SYSTEM_CSS = f"""
         border-bottom: 1px solid var(--border-primary);
     }}
 
+    /* Book list in sidebar */
+    .book-list {{
+        font-size: 0.78rem;
+        line-height: 1.7;
+        color: var(--text-secondary) !important;
+    }}
+
+    .book-list-item {{
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.15rem 0;
+    }}
+
+    .book-dot {{
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent-primary);
+        flex-shrink: 0;
+    }}
+
     /* ===== WELCOME SCREEN ===== */
     .welcome-container {{
         display: flex;
@@ -396,20 +420,21 @@ DESIGN_SYSTEM_CSS = f"""
     }}
 
     .welcome-icon {{
-        width: 64px;
-        height: 64px;
+        width: 72px;
+        height: 72px;
         border-radius: var(--radius-lg);
         background: var(--accent-gradient);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.75rem;
+        font-size: 2rem;
         margin-bottom: 1.5rem;
         box-shadow: var(--shadow-glow), var(--shadow-md);
+        animation: gentleFloat 3s ease-in-out infinite;
     }}
 
     .welcome-title {{
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Playfair Display', serif;
         font-size: 2rem;
         font-weight: 800;
         background: var(--accent-gradient);
@@ -419,7 +444,7 @@ DESIGN_SYSTEM_CSS = f"""
         background-clip: text;
         animation: gradientShift 4s ease-in-out infinite;
         margin-bottom: 0.5rem;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.02em;
         text-align: center;
     }}
 
@@ -427,9 +452,22 @@ DESIGN_SYSTEM_CSS = f"""
         font-size: 1rem;
         color: var(--text-secondary);
         text-align: center;
-        max-width: 460px;
-        line-height: 1.6;
+        max-width: 520px;
+        line-height: 1.7;
+        margin-bottom: 0.75rem;
+    }}
+
+    .welcome-attribution {{
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        text-align: center;
+        font-style: italic;
         margin-bottom: 2.5rem;
+    }}
+
+    .welcome-attribution a {{
+        color: var(--accent-primary);
+        text-decoration: none;
     }}
 
     /* ===== CHAT MESSAGES ===== */
@@ -471,7 +509,7 @@ DESIGN_SYSTEM_CSS = f"""
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background: var(--success);
+        background: var(--accent-primary);
     }}
 
     .source-card {{
@@ -508,9 +546,9 @@ DESIGN_SYSTEM_CSS = f"""
     }}
 
     .source-card-name {{
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.8rem;
-        font-weight: 600;
+        font-family: 'Playfair Display', serif;
+        font-size: 0.85rem;
+        font-weight: 700;
         color: var(--accent-primary);
     }}
 
@@ -521,6 +559,19 @@ DESIGN_SYSTEM_CSS = f"""
         background: var(--bg-tertiary);
         padding: 0.15rem 0.45rem;
         border-radius: 4px;
+    }}
+
+    .source-card-link {{
+        font-size: 0.72rem;
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: opacity 0.2s;
+    }}
+
+    .source-card-link:hover {{
+        opacity: 0.8;
+        text-decoration: underline;
     }}
 
     .source-confidence {{
@@ -599,7 +650,7 @@ DESIGN_SYSTEM_CSS = f"""
         gap: 1rem;
         padding: 1.1rem 1.25rem;
         background: var(--bg-card);
-        border: 1px solid rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(212, 91, 91, 0.2);
         border-left: 3px solid var(--error);
         border-radius: var(--radius-md);
         animation: fadeInUp 0.3s ease;
@@ -818,9 +869,9 @@ def get_conversation_title(messages):
     return "New conversation"
 
 
-def format_confidence(distance):
-    """Convert cosine distance to confidence percentage and CSS class."""
-    confidence = max(0, (1 - distance) * 100)
+def format_similarity(similarity):
+    """Convert similarity score to confidence percentage and CSS class."""
+    confidence = max(0, similarity * 100)
     if confidence >= 80:
         css_class = "confidence-high"
         bar_color = "var(--success)"
@@ -849,39 +900,62 @@ def render_error(title, description, action=None):
 
 
 def display_sources(sources: list[dict]):
-    """Render retrieved source chunks as expandable citation cards."""
+    """Render retrieved scripture sources as expandable citation cards."""
     if not sources:
         return
 
-    # Build source pills as a single compact HTML string
+    # Build source pills
     pills = []
     for s in sources:
-        conf, _, _ = format_confidence(s["distance"])
+        conf, _, _ = format_similarity(s.get("similarity", 0))
+        reference = s.get("reference", "Unknown")
         pills.append(
             f'<span class="source-pill">'
             f'<span class="source-pill-dot"></span>'
-            f'{s["source"]} &middot; {conf:.0f}%'
+            f'{reference} &middot; {conf:.0f}%'
             f'</span>'
         )
     pills_html = '<div class="source-pills">' + "".join(pills) + '</div>'
     st.markdown(pills_html, unsafe_allow_html=True)
 
-    with st.expander(f"{len(sources)} sources retrieved", expanded=False):
+    with st.expander(f"📖 {len(sources)} scripture sources", expanded=False):
         for source in sources:
-            confidence, css_class, bar_color = format_confidence(source["distance"])
+            similarity = source.get("similarity", 0)
+            confidence, css_class, bar_color = format_similarity(similarity)
+            reference = source.get("reference", "Unknown")
+            book = source.get("book", "")
+            chapter_title = source.get("chapter_title", "")
+            url = source.get("url", "")
+            content_type = source.get("content_type", "")
 
-            display_text = source["text"][:350]
-            if len(source["text"]) > 350:
+            display_text = source.get("text", "")[:400]
+            if len(source.get("text", "")) > 400:
                 display_text += "..."
             # Escape HTML entities
-            display_text = display_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            display_text = (display_text.replace("&", "&amp;")
+                           .replace("<", "&lt;").replace(">", "&gt;"))
+
+            # Build the vedabase link
+            link_html = ""
+            if url:
+                link_html = (
+                    f'<a href="{url}" target="_blank" '
+                    f'class="source-card-link">📖 Read on Vedabase →</a>'
+                )
+
+            type_badge = ""
+            if content_type:
+                type_label = content_type.replace("_", " ").title()
+                type_badge = (
+                    f'<span class="source-card-chunk">{type_label}</span>'
+                )
 
             card_html = (
                 f'<div class="source-card">'
                 f'<div class="source-card-header">'
                 f'<div class="source-card-title">'
-                f'<span class="source-card-name">{source["source"]}</span>'
-                f'<span class="source-card-chunk">Chunk #{source["chunk_index"]}</span>'
+                f'<span class="source-card-name">{reference}</span>'
+                f'{type_badge}'
                 f'</div>'
                 f'<div class="source-confidence">'
                 f'<div class="confidence-bar-track">'
@@ -891,6 +965,7 @@ def display_sources(sources: list[dict]):
                 f'</div>'
                 f'</div>'
                 f'<div class="source-card-body">{display_text}</div>'
+                f'{link_html}'
                 f'</div>'
             )
             st.markdown(card_html, unsafe_allow_html=True)
@@ -898,19 +973,23 @@ def display_sources(sources: list[dict]):
 
 def export_chat_markdown():
     """Build a Markdown string from the current conversation."""
-    lines = ["# RAG Chatbot — Conversation Export\n"]
+    lines = ["# Vedabase Spiritual Assistant — Conversation Export\n"]
     lines.append(f"Exported at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     lines.append("---\n")
     for msg in st.session_state.messages:
-        role = "**You**" if msg["role"] == "user" else "**Assistant**"
+        role = "**You**" if msg["role"] == "user" else "**🙏 Assistant**"
         timestamp = msg.get("timestamp", "")
         lines.append(f"### {role}  _{timestamp}_\n")
         lines.append(f"{msg['content']}\n")
         if "sources" in msg:
-            lines.append("\n**Sources:**\n")
+            lines.append("\n**📖 Sources:**\n")
             for s in msg["sources"]:
-                conf = max(0, (1 - s["distance"]) * 100)
-                lines.append(f"- {s['source']} (Chunk #{s['chunk_index']}, {conf:.1f}% match)\n")
+                ref = s.get("reference", "Unknown")
+                book = s.get("book", "")
+                url = s.get("url", "")
+                sim = s.get("similarity", 0)
+                link = f" — [Read on Vedabase]({url})" if url else ""
+                lines.append(f"- **{ref}** ({book}, {sim*100:.1f}% match){link}\n")
         lines.append("\n---\n")
     return "\n".join(lines)
 
@@ -923,22 +1002,16 @@ with st.sidebar:
     # Brand
     st.markdown("""
     <div class="sidebar-brand">
-        <div class="sidebar-brand-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                <path d="M8 10h8"/><path d="M8 14h4"/>
-            </svg>
-        </div>
+        <div class="sidebar-brand-icon">🕉️</div>
         <div class="sidebar-brand-text">
-            <div class="sidebar-brand-name">RAG Assistant</div>
-            <div class="sidebar-brand-tag">Knowledge-Grounded AI</div>
+            <div class="sidebar-brand-name">Vedabase Assistant</div>
+            <div class="sidebar-brand-tag">Scripture-Grounded Spiritual AI</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     # New Chat button
-    if st.button("+ New Chat", type="primary", use_container_width=True):
-        # Save current conversation to history if it has messages
+    if st.button("🙏 New Conversation", type="primary", use_container_width=True):
         if st.session_state.messages:
             title = get_conversation_title(st.session_state.messages)
             st.session_state.conversations.insert(0, {
@@ -957,7 +1030,6 @@ with st.sidebar:
 
         for i, conv in enumerate(st.session_state.conversations[:8]):
             if st.button(conv['title'], key=f"conv_{i}", use_container_width=True):
-                # Save current first
                 if st.session_state.messages:
                     current_title = get_conversation_title(st.session_state.messages)
                     st.session_state.conversations.insert(0, {
@@ -965,7 +1037,6 @@ with st.sidebar:
                         "messages": st.session_state.messages.copy(),
                         "timestamp": datetime.now().strftime("%b %d, %I:%M %p"),
                     })
-                # Restore selected conversation
                 restored = st.session_state.conversations.pop(
                     i + (1 if st.session_state.messages else 0)
                 )
@@ -974,43 +1045,34 @@ with st.sidebar:
 
     st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
 
-    # Upload section
-    st.markdown('<div class="sidebar-section"><div class="sidebar-label">Add Knowledge</div></div>', unsafe_allow_html=True)
-    uploaded_file = st.file_uploader(
-        "Upload .txt or .md",
-        type=["txt", "md"],
-        label_visibility="collapsed",
-    )
-    if uploaded_file is not None:
-        if st.button("Index Document", type="primary", use_container_width=True):
-            with st.spinner("Indexing document..."):
-                save_path = Path("data") / uploaded_file.name
-                save_path.parent.mkdir(exist_ok=True)
-                with open(save_path, "wb") as f:
-                    f.write(uploaded_file.getbuffer())
-                try:
-                    ingest_single_document(save_path)
-                    st.success(f"Indexed {uploaded_file.name} successfully.")
-                    time.sleep(1)
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Failed to index: {e}")
-
-    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # Index status
-    st.markdown('<div class="sidebar-section"><div class="sidebar-label">Vector Index</div></div>', unsafe_allow_html=True)
+    # Knowledge Base Status
+    st.markdown('<div class="sidebar-section"><div class="sidebar-label">Knowledge Base</div></div>', unsafe_allow_html=True)
 
     try:
-        collection = get_chroma_collection()
-        doc_count = collection.count()
+        stats = get_collection_stats()
+        doc_count = stats["total_chunks"]
+        books = stats["books"]
         st.markdown(f"""
         <div class="status-badge status-online">
             <div class="status-dot"></div>
             <span class="status-text">Active</span>
-            <span class="status-count">{doc_count} chunks</span>
+            <span class="status-count">{doc_count:,} chunks</span>
         </div>
         """, unsafe_allow_html=True)
+
+        if books:
+            with st.expander(f"📚 {len(books)} Books Indexed", expanded=False):
+                book_html = '<div class="book-list">'
+                for book in books:
+                    book_html += (
+                        f'<div class="book-list-item">'
+                        f'<span class="book-dot"></span>'
+                        f'{book}'
+                        f'</div>'
+                    )
+                book_html += '</div>'
+                st.markdown(book_html, unsafe_allow_html=True)
+
     except Exception:
         st.markdown("""
         <div class="status-badge status-offline">
@@ -1018,24 +1080,26 @@ with st.sidebar:
             <span class="status-text">Offline</span>
         </div>
         """, unsafe_allow_html=True)
-        st.caption("Run `python ingest.py` to build the index.")
+        st.caption("Run `python scraper.py` then `python ingest_vedabase.py`")
 
-    # Pipeline info (collapsible)
+    # Pipeline info
     with st.expander("Pipeline Settings", expanded=False):
         st.markdown("""
         <div class="config-grid">
             <span class="config-key">Embedding</span>
             <span class="config-val">gemini-embedding-001</span>
             <span class="config-key">LLM</span>
-            <span class="config-val">gemini-flash-latest</span>
-            <span class="config-key">Chunk Size</span>
-            <span class="config-val">~500 tokens</span>
-            <span class="config-key">Overlap</span>
-            <span class="config-val">~50 tokens</span>
+            <span class="config-val">gemini-2.0-flash</span>
+            <span class="config-key">Chunking</span>
+            <span class="config-val">Verse-aware</span>
+            <span class="config-key">Max Chunk</span>
+            <span class="config-val">~800 tokens</span>
             <span class="config-key">Retrieval</span>
-            <span class="config-val">Top-4 Cosine</span>
+            <span class="config-val">Top-6 Cosine</span>
             <span class="config-key">Vector DB</span>
             <span class="config-val">ChromaDB</span>
+            <span class="config-key">Source</span>
+            <span class="config-val">vedabase.io</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1066,7 +1130,7 @@ with st.sidebar:
     # Theme toggle + Clear
     col_theme, col_clear = st.columns(2)
     with col_theme:
-        theme_label = "Light" if st.session_state.theme == "dark" else "Dark"
+        theme_label = "☀️ Light" if st.session_state.theme == "dark" else "🌙 Dark"
         if st.button(theme_label, use_container_width=True):
             st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
             st.rerun()
@@ -1081,9 +1145,9 @@ with st.sidebar:
     if st.session_state.messages:
         export_md = export_chat_markdown()
         st.download_button(
-            "Export Chat",
+            "📥 Export Chat",
             data=export_md,
-            file_name=f"rag_chat_{datetime.now().strftime('%Y%m%d_%H%M')}.md",
+            file_name=f"vedabase_chat_{datetime.now().strftime('%Y%m%d_%H%M')}.md",
             mime="text/markdown",
             use_container_width=True,
         )
@@ -1097,25 +1161,27 @@ with st.sidebar:
 if not st.session_state.messages:
     st.markdown("""
     <div class="welcome-container">
-        <div class="welcome-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                <path d="M8 10h8"/><path d="M8 14h4"/>
-            </svg>
-        </div>
-        <div class="welcome-title">What would you like to know?</div>
+        <div class="welcome-icon">🕉️</div>
+        <div class="welcome-title">Ask Any Spiritual Question</div>
         <div class="welcome-subtitle">
-            Ask questions grounded in your uploaded documents with verifiable source citations.
+            Receive answers grounded exclusively in the teachings of
+            Śrīla Prabhupāda — with precise verse citations and
+            links back to the original scripture.
+        </div>
+        <div class="welcome-attribution">
+            Knowledge sourced from <a href="https://vedabase.io" target="_blank">vedabase.io</a>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Suggested prompts as clickable buttons
+    # Spiritual starter prompts
     suggested = [
-        "Summarize my skills",
-        "What projects have I built?",
-        "What is my background?",
-        "What are my future plans?",
+        "What is the purpose of human life?",
+        "What does Krishna say about the soul?",
+        "How should one deal with fear and anxiety?",
+        "What is karma and how does it work?",
+        "How does one attain peace of mind?",
+        "What is the significance of chanting Hare Krishna?",
     ]
 
     cols = st.columns(2)
@@ -1151,7 +1217,7 @@ if "suggested_prompt" in st.session_state:
 
 # Chat input
 if input_prompt is None:
-    input_prompt = st.chat_input("Ask a question about your documents...")
+    input_prompt = st.chat_input("Ask a spiritual question... 🙏")
 
 if input_prompt:
     timestamp = get_timestamp()
@@ -1179,12 +1245,12 @@ if input_prompt:
                 '<div class="thinking-dot"></div>'
                 '<div class="thinking-dot"></div>'
                 '</div>'
-                '<span>Searching documents...</span>'
+                '<span>Searching scriptures...</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
 
-            # Call backend (unchanged)
+            # Call backend
             result = query_rag_stream(input_prompt)
             sources = result["sources"]
 
@@ -1214,13 +1280,13 @@ if input_prompt:
         except FileNotFoundError:
             thinking.empty()
             render_error(
-                "Index Not Found",
-                "The document index hasn't been created yet. You need to run the ingestion pipeline first.",
-                "python ingest.py",
+                "Knowledge Base Not Found",
+                "The scripture index hasn't been created yet. Please scrape and ingest the Vedabase content first.",
+                "python scraper.py --books bg && python ingest_vedabase.py",
             )
             st.session_state.messages.append({
                 "role": "assistant",
-                "content": "Document index not found. Please run `python ingest.py` to initialize the database.",
+                "content": "Knowledge base not found. Please run the scraper and ingestion pipeline first.",
                 "timestamp": get_timestamp(),
             })
 
@@ -1229,7 +1295,7 @@ if input_prompt:
             render_error(
                 "Configuration Error",
                 str(e),
-                "Check your .env file",
+                "Check your .env file for GEMINI_API_KEY",
             )
             st.session_state.messages.append({
                 "role": "assistant",
